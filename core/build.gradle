@@ -16,5 +16,5 @@ dependencies {
 }
 
 tasks.named('compileJava') {
-    dependsOn(':storage:db-core:build')
+//    dependsOn(':storage:db-core:build')
 }
