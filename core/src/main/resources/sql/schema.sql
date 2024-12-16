@@ -8,7 +8,7 @@ create table reservations
     time_id        bigint       not null,
     status         varchar(255) not null default 'CONFIRMED',
     reserved_at    varchar(255) not null,
-    canceled_at   varchar(255),
+    canceled_at    varchar(255),
     primary key (reservation_id)
 );
 
@@ -29,4 +29,15 @@ CREATE TABLE themes
     description VARCHAR(255) NOT NULL,
     thumbnail   VARCHAR(255) NOT NULL,
     deleted     BOOLEAN      NOT NULL DEFAULT false
+);
+
+-- users
+DROP TABLE IF EXISTS users;
+CREATE TABLE users
+(
+    user_id  BIGINT       NOT NULL AUTO_INCREMENT primary key,
+    role     VARCHAR(255) NOT NULL,
+    name     VARCHAR(255) NOT NULL,
+    email    VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
