@@ -29,6 +29,10 @@ public class User {
         this.password = password;
     }
 
+    public boolean matchesPassword(final String password) {
+        return Objects.nonNull(password) && this.password.equals(password);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

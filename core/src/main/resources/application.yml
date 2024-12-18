@@ -18,6 +18,11 @@ spring:
       schema-locations: classpath:sql/schema.sql
       data-locations: classpath:sql/data.sql
 
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET_KEY}
+
 logging:
   level:
     org:

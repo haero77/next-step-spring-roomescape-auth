@@ -126,5 +126,7 @@ public class UserJdbcRepository {
                 .build();
     }
 
-    // todo: Create deleteAll method and use when data cleansing for test code.
+    public void deleteAllInBatch() {
+        jdbcTemplate.execute("delete from users");
+    }
 }
