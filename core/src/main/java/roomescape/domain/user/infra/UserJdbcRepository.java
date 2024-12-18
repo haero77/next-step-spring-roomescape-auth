@@ -1,21 +1,63 @@
 package roomescape.domain.user.infra;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import roomescape.domain.common.exception.DataAccessException;
 import roomescape.domain.user.domain.User;
+import roomescape.domain.user.domain.UserRole;
 
 import java.sql.PreparedStatement;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class UserJdbcRepository {
 
+    private static final String SELECT_ALL_USER_SQL = """
+            select
+                user_id,
+                role,
+                name,
+                email,
+                password
+            from users""";
+
+    private static final RowMapper<User> USER_ENTITY_ROW_MAPPER =
+            (rs, rowNum) -> User.builder()
+                    .id(rs.getLong("user_id"))
+                    .role(UserRole.valueOf(rs.getString("role")))
+                    .name(rs.getString("name"))
+                    .email(rs.getString("email"))
+                    .password(rs.getString("password"))
+                    .build();
+
     private final JdbcTemplate jdbcTemplate;
+
+    public Optional<User> findByEmail(final String email) {
+        if (Objects.isNull(email)) {
+            return Optional.empty();
+        }
+        return queryForTheme(SELECT_ALL_USER_SQL + " where email = ? ", email);
+    }
+
+    private Optional<User> queryForTheme(final String selectSql, Object... objects) {
+        try {
+            final User user = jdbcTemplate.queryForObject(
+                    selectSql,
+                    USER_ENTITY_ROW_MAPPER,
+                    objects
+            );
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
 
     public User save(final User user) {
         if (Objects.isNull(user.getId())) {
