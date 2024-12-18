@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import roomescape.domain.reservation.infra.ReservationJdbcRepository;
 import roomescape.domain.reservationtime.infra.ReservationTimeJdbcRepository;
 import roomescape.domain.theme.infra.ThemeJdbcRepository;
+import roomescape.domain.user.infra.UserJdbcRepository;
 
 @Component
 public class DataCleanser {
@@ -18,7 +19,11 @@ public class DataCleanser {
     @Autowired
     ThemeJdbcRepository themeRepository;
 
+    @Autowired
+    UserJdbcRepository userRepository;
+
     public void clean() {
+        userRepository.deleteAllInBatch();
         reservationRepository.deleteAllInBatch();
         reservationTimeRepository.deleteAllInBatch();
         themeRepository.deleteAllInBatch();
