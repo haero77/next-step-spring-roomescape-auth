@@ -8,6 +8,8 @@ public enum CustomErrorCode {
     NOT_DEFINED("NOT DEFINED YET"),
     SERVER_ERROR("INTERNAL SERVER ERROR"),
 
+    A401("Invalid Login Request"),
+
     R404("Reservation not found"),
     R405("Reservation duplicated"),
     R406("Reservation already canceled"),

@@ -1,4 +1,11 @@
 /**
+  INSERT users
+ */
+INSERT INTO users(user_id, role, name, email, password)
+VALUES (1, 'ADMIN', 'admin', 'email@email.com', 'password');
+
+
+/**
   INSERT reservation_times
  */
 INSERT INTO reservation_times (time_id, start_at, created_at)

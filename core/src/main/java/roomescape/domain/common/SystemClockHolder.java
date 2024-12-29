@@ -13,7 +13,11 @@ public class SystemClockHolder implements ClockHolder {
 
     @Override
     public LocalDateTime getCurrentSeoulTime() {
-        return ZonedDateTime.now(SEOUL_ZONE_ID).toLocalDateTime();
+        return getCurrentSeoulZonedDateTime().toLocalDateTime();
     }
 
+    @Override
+    public ZonedDateTime getCurrentSeoulZonedDateTime() {
+        return ZonedDateTime.now(SEOUL_ZONE_ID);
+    }
 }
