@@ -35,4 +35,14 @@ public class AuthApi {
 
         return ApiResponse.okWithEmptyData();
     }
+
+    @PostMapping("/api/logout")
+    public ApiResponse<Void> logout(final HttpServletResponse servletResponse) {
+        final HttpCookie cookie = ResponseCookie.from("accessToken", "")
+                .maxAge(0)
+                .build();
+        servletResponse.addHeader("Set-Cookie", cookie.toString());
+
+        return ApiResponse.okWithEmptyData();
+    }
 }
