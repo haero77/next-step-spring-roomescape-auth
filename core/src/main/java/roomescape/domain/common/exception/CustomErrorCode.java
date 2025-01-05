@@ -7,6 +7,7 @@ public enum CustomErrorCode {
 
     NOT_DEFINED("NOT DEFINED YET"),
     SERVER_ERROR("INTERNAL SERVER ERROR"),
+    UNAUTHORIZED("Unauthorized"),
 
     A401("Invalid Login Request"),
 

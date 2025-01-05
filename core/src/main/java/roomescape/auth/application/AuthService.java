@@ -6,6 +6,7 @@ import roomescape.auth.application.dto.JwtPayload;
 import roomescape.auth.application.dto.LoginRequest;
 import roomescape.auth.application.dto.LoginToken;
 import roomescape.auth.exception.InvalidLoginRequestException;
+import roomescape.auth.support.JwtProvider;
 import roomescape.domain.user.domain.User;
 import roomescape.domain.user.domain.UserRepository;
 
