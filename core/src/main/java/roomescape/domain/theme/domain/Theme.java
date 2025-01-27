@@ -2,6 +2,7 @@ package roomescape.domain.theme.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import roomescape.domain.common.exception.Assert;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +25,8 @@ public class Theme {
             final boolean deleted
     ) {
         verifyThemeName(name);
+        Assert.notNullField(description, "description");
+        Assert.notNullField(thumbnail, "thumbnail");
 
         this.id = id;
         this.name = name;
@@ -70,8 +73,12 @@ public class Theme {
 
     @Override
     public boolean equals(final Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
         final Theme theme = (Theme) object;
         return Objects.equals(id, theme.id);
     }
