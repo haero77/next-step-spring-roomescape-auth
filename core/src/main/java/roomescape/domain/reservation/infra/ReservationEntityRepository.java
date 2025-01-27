@@ -10,7 +10,6 @@ import roomescape.domain.theme.domain.ThemeId;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 @RequiredArgsConstructor
 public class ReservationEntityRepository implements ReservationRepository {
@@ -45,6 +44,11 @@ public class ReservationEntityRepository implements ReservationRepository {
     @Override
     public List<Reservation> findAllByThemeId(final ThemeId themeId) {
         return jdbcRepository.findAllByThemeId(themeId);
+    }
+
+    @Override
+    public List<Reservation> findAllByThemeIdAndDate(final ThemeId themeId, final ReservationDate date) {
+        return jdbcRepository.findAllByThemeIdAndDate(themeId, date);
     }
 
     @Override

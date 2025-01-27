@@ -232,4 +232,38 @@ class ReservationRepositoryTest extends IntegrationTestSupport {
                         tuple(new ReservationGuestName("r1"), new ThemeId(100L), new ReservationTimeId(1000L))
                 );
     }
+
+    @Test
+    void findAllByThemeIdAndDate() {
+        // given
+        createReservation(new ThemeId(1000L), LocalDate.of(2025, 1, 27), new ReservationTimeId(1000L), "A");
+        createReservation(new ThemeId(2000L), LocalDate.of(2025, 1, 27), new ReservationTimeId(2000L), "B");
+        createReservation(new ThemeId(2000L), LocalDate.of(2025, 1, 27), new ReservationTimeId(3000L), "C");
+
+        LocalDate date = LocalDate.of(2025, 1, 27);
+        ThemeId themeId = new ThemeId(2000L);
+
+        // when
+        List<Reservation> actual = sut.findAllByThemeIdAndDate(themeId, new ReservationDate(date));
+
+        // then
+        assertThat(actual).hasSize(2)
+                .extracting("themeId", "name", "date", "timeId")
+                .containsExactlyInAnyOrder(
+                        tuple(new ThemeId(2000L), new ReservationGuestName("B"), new ReservationDate(LocalDate.of(2025, 1, 27)), new ReservationTimeId(2000L)),
+                        tuple(new ThemeId(2000L), new ReservationGuestName("C"), new ReservationDate(LocalDate.of(2025, 1, 27)), new ReservationTimeId(3000L))
+                );
+    }
+
+    private Reservation createReservation(final ThemeId themeId, LocalDate reservationDate, final ReservationTimeId timeId, final String guestName) {
+        final Reservation reservation2 = Reservation.builder()
+                .themeId(themeId)
+                .timeId(timeId)
+                .name(new ReservationGuestName(guestName))
+                .date(new ReservationDate(reservationDate))
+                .status(ReservationStatus.CONFIRMED)
+                .reservedAt(LocalDateTime.of(2024, 6, 4, 12, 0))
+                .build();
+        return sut.save(reservation2);
+    }
 }

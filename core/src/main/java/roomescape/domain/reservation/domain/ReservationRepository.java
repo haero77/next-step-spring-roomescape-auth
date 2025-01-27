@@ -1,6 +1,5 @@
 package roomescape.domain.reservation.domain;
 
-
 import roomescape.domain.reservationtime.domain.ReservationTimeId;
 import roomescape.domain.theme.domain.ThemeId;
 
@@ -22,6 +21,8 @@ public interface ReservationRepository {
     List<Reservation> findAllByTimeId(ReservationTimeId timeId);
 
     List<Reservation> findAllByThemeId(ThemeId themeId);
+
+    List<Reservation> findAllByThemeIdAndDate(ThemeId themeId, ReservationDate date);
 
     List<Reservation> findAll();
 }

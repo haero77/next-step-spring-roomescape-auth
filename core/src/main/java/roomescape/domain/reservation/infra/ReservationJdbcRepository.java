@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import static roomescape.global.utils.DateTimeFormatUtils.toIsoLocal;
 
-
 @Slf4j
 @Repository
 public class ReservationJdbcRepository {
@@ -149,6 +148,16 @@ public class ReservationJdbcRepository {
     public Optional<Reservation> findById(final Long reservationId) {
         final String selectSql = generateSelectSqlWithWhereCondition("where reservation_id = ?");
         return queryForReservation(selectSql, reservationId);
+    }
+
+    public List<Reservation> findAllByThemeIdAndDate(final ThemeId themeId, final ReservationDate date) {
+        final String selectSql = generateSelectSqlWithWhereCondition("where theme_id = ? and r.date = ?");
+        return jdbcTemplate.query(
+                selectSql,
+                RESERVATION_ROW_MAPPER,
+                themeId.value(),
+                toIsoLocal(date.getValue())
+        );
     }
 
     public Optional<Reservation> findBy(
