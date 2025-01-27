@@ -1,15 +1,20 @@
 package roomescape.auth.api;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.auth.api.response.LoginCheckResponse;
 import roomescape.auth.application.AuthService;
 import roomescape.auth.application.dto.LoginRequest;
 import roomescape.auth.application.dto.LoginToken;
+import roomescape.auth.support.JwtSupporter;
+import roomescape.domain.user.domain.User;
 import roomescape.global.rest.ApiResponse;
 
 @RestController
@@ -17,6 +22,7 @@ import roomescape.global.rest.ApiResponse;
 public class AuthApi {
 
     private final AuthService authService;
+    private final JwtSupporter jwtSupporter;
 
     @PostMapping("/api/login")
     public ApiResponse<Void> login(
@@ -34,6 +40,15 @@ public class AuthApi {
         servletResponse.addHeader("Set-Cookie", cookie.toString());
 
         return ApiResponse.okWithEmptyData();
+    }
+
+    @GetMapping("/api/login/check")
+    public ApiResponse<LoginCheckResponse> loginCheck(HttpServletRequest servletRequest) {
+        LoginToken loginToken = jwtSupporter.extractLoginToken(servletRequest);  // todo AOP를 이용한 LoginToken 주입 받기.
+        User user = authService.getUserByLoginToken(loginToken); // todo 이미 로그인한 상태의 User를 AOP를 이용해서 주입 받기
+
+        LoginCheckResponse response = new LoginCheckResponse(user.getName(), user.getRole());
+        return ApiResponse.ok(response);
     }
 
     @PostMapping("/api/logout")
