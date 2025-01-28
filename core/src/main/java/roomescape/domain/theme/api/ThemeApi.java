@@ -18,14 +18,14 @@ public class ThemeApi {
 
     private final ThemeService themeService;
 
-    @GetMapping("/themes")
+    @GetMapping("/api/themes")
     public ApiResponse<List<ThemeQueryResponse>> getThemes() {
         final List<Theme> themes = themeService.findAll();
         final List<ThemeQueryResponse> response = ThemeQueryResponse.fromThemes(themes);
         return ApiResponse.ok(response);
     }
 
-    @PostMapping("/themes")
+    @PostMapping("/api/themes")
     public ApiResponse<ThemeAppendResponse> appendTheme(
             @RequestBody ThemeAppendHttpRequest request
     ) {
@@ -33,7 +33,7 @@ public class ThemeApi {
         return ApiResponse.ok(ThemeAppendResponse.fromTheme(theme));
     }
 
-    @DeleteMapping("/themes/{themeId}")
+    @DeleteMapping("/api/themes/{themeId}")
     public ApiResponse<Object> deleteTheme(@PathVariable Long themeId) {
         themeService.deleteTheme(new ThemeId(themeId));
         return ApiResponse.okWithEmptyData();

@@ -10,6 +10,7 @@ import roomescape.domain.reservationtime.domain.ReservationTime;
 import roomescape.domain.reservationtime.domain.ReservationTimeRepository;
 import roomescape.domain.theme.domain.Theme;
 import roomescape.domain.theme.domain.ThemeRepository;
+import roomescape.fixture.LoginFixture;
 import roomescape.support.RestAssuredTestSupport;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,9 @@ class ReservationApiTest extends RestAssuredTestSupport {
 
     @Autowired
     ThemeRepository themeRepository;
+
+    @Autowired
+    LoginFixture loginFixture;
 
     @DisplayName("예약을 생성한다")
     @Test
@@ -45,16 +49,20 @@ class ReservationApiTest extends RestAssuredTestSupport {
         params.put("timeId", String.valueOf(savedTime.getIdValue()));
         params.put("themeId", String.valueOf(themeSaved.getId().value()));
 
+        String accessToken = loginFixture.loginWithUserName("홍길동");
+
         final ValidatableResponse response = RestAssured.given().log().all()
+                .cookie("accessToken", accessToken)
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/reservations")
+                .when().post("/api/reservations")
                 .then().log().all()
                 .statusCode(200);
 
         // 조회
         RestAssured.given().log().all()
-                .when().get("/reservations")
+                .cookie("accessToken", accessToken)
+                .when().get("/api/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.size()", is(1));
@@ -63,14 +71,16 @@ class ReservationApiTest extends RestAssuredTestSupport {
 
         // 취소
         RestAssured.given().log().all()
+                .cookie("accessToken", accessToken)
                 .contentType(ContentType.JSON)
-                .when().pathParam("reservationId", reservationId).post("/reservations/{reservationId}/cancel")
+                .when().pathParam("reservationId", reservationId).post("/api/reservations/{reservationId}/cancel")
                 .then().log().all()
                 .statusCode(200);
 
         // 조회
         RestAssured.given().log().all()
-                .when().get("/reservations")
+                .cookie("accessToken", accessToken)
+                .when().get("/api/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.size()", is(1))

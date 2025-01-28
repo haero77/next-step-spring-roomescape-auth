@@ -16,7 +16,7 @@ public class ReservationQueryApi {
 
     private final ReservationQueryService queryService;
 
-    @GetMapping("/reservations")
+    @GetMapping("/api/reservations")
     public ApiResponse<List<ReservationQueryHttpResponse>> fetchAll() {
         final List<ReservationTimeThemeDto> reservationTimeThemeDtos = queryService.fetchReservationThemes();
         return ApiResponse.ok(ReservationQueryHttpResponse.from(reservationTimeThemeDtos));

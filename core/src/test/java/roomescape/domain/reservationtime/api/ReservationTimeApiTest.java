@@ -116,11 +116,14 @@ class ReservationTimeApiTest extends RestAssuredTestSupport {
         Map<String, String> timeAppendHttpRequest = new HashMap<>();
         timeAppendHttpRequest.put("startAt", "10:00");
 
+        String accessToken = loginFixture.loginWithUserName("홍길동");
+
         // 예약 시간 추가
         final ValidatableResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("accessToken", accessToken)
                 .body(timeAppendHttpRequest)
-                .when().post("/times")
+                .when().post("/api/times")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.startAt", is("10:00"));
@@ -129,21 +132,25 @@ class ReservationTimeApiTest extends RestAssuredTestSupport {
 
         // 예약 시간 전체 조회
         RestAssured.given().log().all()
-                .when().get("/times")
+                .cookie("accessToken", accessToken)
+                .when().get("/api/times")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.size()", is(1));
 
         // 예약 시간 삭제
         RestAssured.given().log().all()
+                .cookie("accessToken", accessToken)
                 .when()
                 .pathParam("timeId", timeId)
-                .delete("/times/{timeId}")
+                .delete("/api/times/{timeId}")
                 .then().log().all()
                 .statusCode(200);
 
+        // 예약 시간 삭제 후 조회
         RestAssured.given().log().all()
-                .when().get("/times")
+                .cookie("accessToken", accessToken)
+                .when().get("/api/times")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.size()", is(0));

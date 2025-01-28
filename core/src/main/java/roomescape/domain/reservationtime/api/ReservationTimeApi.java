@@ -20,7 +20,7 @@ public class ReservationTimeApi {
     private final ReservationTimeCommandService timeCommandService;
     private final ReservationTimeQueryService timeQueryService;
 
-    @PostMapping("/times")
+    @PostMapping("/api/times")
     public ApiResponse<ReservationTimeAppendHttpResponse> append(
             @RequestBody ReservationTimeAppendRequest request
     ) {
@@ -28,13 +28,13 @@ public class ReservationTimeApi {
         return ApiResponse.ok(ReservationTimeAppendHttpResponse.from(appended));
     }
 
-    @GetMapping("/times")
+    @GetMapping("/api/times")
     public ApiResponse<List<ReservationTimeAppendHttpResponse>> fetchAll() {
         List<ReservationTime> times = timeQueryService.fetchAll();
         return ApiResponse.ok(ReservationTimeAppendHttpResponse.from(times));
     }
 
-    @DeleteMapping("/times/{timeId}")
+    @DeleteMapping("/api/times/{timeId}")
     public ApiResponse<Object> delete(
             @PathVariable(name = "timeId") Long timeId
     ) {
