@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import roomescape.auth.application.dto.LoginRequest;
+import roomescape.auth.application.dto.SignUpRequest;
 import roomescape.domain.user.domain.User;
 import roomescape.domain.user.domain.UserRepository;
 import roomescape.domain.user.domain.UserRole;
@@ -16,6 +17,7 @@ import roomescape.support.RestAssuredTestSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AuthApiTest extends RestAssuredTestSupport {
 
@@ -24,6 +26,68 @@ class AuthApiTest extends RestAssuredTestSupport {
 
     @Autowired
     LoginFixture loginFixture;
+
+    @DisplayName("이메일, 비밀번호, 이름, 역할을 이용하여 회원가입 가능")
+    @Test
+    void postSignUp() {
+        // given
+        SignUpRequest signUpRequest = new SignUpRequest(
+                "test@email.com",
+                "password",
+                "name",
+                UserRole.CUSTOMER
+        );
+
+        // when
+        ValidatableResponse response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(signUpRequest)
+                .when().post("/api/signup")
+                .then().log().all();
+
+        // then
+        response.statusCode(200);
+
+        User user = userRepository.findByEmail("test@email.com").get();
+        assertAll(
+                () -> assertThat(user.getEmail()).isEqualTo("test@email.com"),
+                () -> assertThat(user.getPassword()).isEqualTo("password"),
+                () -> assertThat(user.getName()).isEqualTo("name"),
+                () -> assertThat(user.getRole()).isEqualTo(UserRole.CUSTOMER)
+        );
+    }
+
+    @DisplayName("중복된 이메일로 회원가입 시 400 반환")
+    @Test
+    void postSignUp_email_already_in_use() {
+        // given
+        User user = User.builder()
+                .email("test@email.com")
+                .password("pw")
+                .name("test-name")
+                .role(UserRole.ADMIN)
+                .build();
+        userRepository.save(user);
+
+        SignUpRequest signUpRequest = new SignUpRequest(
+                "test@email.com",
+                "password",
+                "name",
+                UserRole.CUSTOMER
+        );
+
+        // when
+        ValidatableResponse response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(signUpRequest)
+                .when().post("/api/signup")
+                .then().log().all();
+
+        // then
+        response.statusCode(400);
+    }
 
     @DisplayName("로그인에 성공 시 로그인 토큰(accessToken)을 발급한다")
     @Test

@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import roomescape.auth.application.dto.JwtPayload;
 import roomescape.auth.application.dto.LoginRequest;
 import roomescape.auth.application.dto.LoginToken;
+import roomescape.auth.application.dto.SignUpRequest;
 import roomescape.auth.exception.InvalidLoginRequestException;
+import roomescape.auth.exception.SignUpException;
 import roomescape.auth.support.JwtProvider;
 import roomescape.auth.support.JwtSupporter;
 import roomescape.domain.user.domain.User;
@@ -23,6 +25,21 @@ public class AuthService {
     private final UserReader userReader;
     private final JwtProvider jwtProvider;
     private final JwtSupporter jwtSupporter;
+
+    public void signUp(final SignUpRequest signUpRequest) {
+        boolean userAlreadyExists = userReader.existsByEmail(signUpRequest.email());
+        if (userAlreadyExists) {
+            throw new SignUpException("email '%s' is already in use".formatted(signUpRequest.email()));
+        }
+
+        User user = User.builder()
+                .email(signUpRequest.email())
+                .password(signUpRequest.password())
+                .name(signUpRequest.name())
+                .role(signUpRequest.role())
+                .build();
+        userRepository.save(user);
+    }
 
     public LoginToken createLoginToken(final LoginRequest loginRequest) {
         final Optional<User> userOpt = userRepository.findByEmail(loginRequest.email());

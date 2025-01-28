@@ -16,6 +16,7 @@ public class SecurityPathConfig {
 
     // 인증이 필요 없는 경로
     private static final List<String> PUBLIC_PATHS = List.of(
+            "/api/signup",
             "/api/login"
     );
 

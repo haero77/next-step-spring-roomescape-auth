@@ -9,6 +9,7 @@ public enum CustomErrorCode {
     SERVER_ERROR("INTERNAL SERVER ERROR"),
     UNAUTHORIZED("Unauthorized"),
 
+    A400("Sign Up Request Invalid"),
     A401("Invalid Login Request"),
 
     R404("Reservation not found"),

@@ -13,6 +13,7 @@ import roomescape.auth.api.response.LoginCheckResponse;
 import roomescape.auth.application.AuthService;
 import roomescape.auth.application.dto.LoginRequest;
 import roomescape.auth.application.dto.LoginToken;
+import roomescape.auth.application.dto.SignUpRequest;
 import roomescape.auth.support.JwtSupporter;
 import roomescape.domain.user.domain.User;
 import roomescape.global.rest.ApiResponse;
@@ -23,6 +24,12 @@ public class AuthApi {
 
     private final AuthService authService;
     private final JwtSupporter jwtSupporter;
+
+    @PostMapping("/api/signup")
+    public ApiResponse<Void> signUp(@RequestBody SignUpRequest signUpRequest) {
+        authService.signUp(signUpRequest);
+        return ApiResponse.okWithEmptyData();
+    }
 
     @PostMapping("/api/login")
     public ApiResponse<Void> login(
