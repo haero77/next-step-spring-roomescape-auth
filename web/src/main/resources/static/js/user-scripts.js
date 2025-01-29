@@ -2,24 +2,11 @@ document.addEventListener('DOMContentLoaded', function () {
   updateUIBasedOnLogin();
 });
 
+/**
+ * 로그아웃 버튼 클릭
+ */
 document.getElementById('logout-btn').addEventListener('click', function (event) {
-  event.preventDefault();
-  fetch('/logout', {
-    method: 'POST', // 또는 서버 설정에 따라 GET 일 수도 있음
-    credentials: 'include' // 쿠키를 포함시키기 위해 필요
-  })
-      .then(response => {
-        if (response.ok) {
-          // 로그아웃 성공, 페이지 새로고침 또는 리다이렉트
-          window.location.reload();
-        } else {
-          // 로그아웃 실패 처리
-          console.error('Logout failed');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+  logout(event);
 });
 
 /**
@@ -140,6 +127,27 @@ function login(event) {
         console.warn('Error during login:', error);
       });
 }
+
+function logout(event) {
+  event.preventDefault();
+  fetch('/api/logout', {
+    method: 'POST',
+    credentials: 'include' // 쿠키를 포함시키기 위해 필요
+  })
+      .then(response => {
+        if (response.status === 200) {
+          // 로그아웃 성공, 페이지 새로고침 또는 리다이렉트
+          window.location.href = '/login';
+        } else {
+          // 로그아웃 실패 처리
+          console.error('Logout failed');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+}
+
 
 function updateUIBasedOnLogin() {
   // fetch('/login/check') // 로그인 상태 확인 API 호출
