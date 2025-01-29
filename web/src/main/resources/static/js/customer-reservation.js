@@ -1,21 +1,25 @@
-const THEME_API_ENDPOINT = '/themes';
+const THEME_API_ENDPOINT = '/api/themes';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 테마 목록 렌더링
   requestRead(THEME_API_ENDPOINT)
       .then(renderTheme)
       .catch(error => console.error('Error fetching times:', error));
 
   flatpickr("#datepicker", {
-    inline: true,
+    inline: true, // 달력이 항상 표시되도록 설정
     onChange: function (selectedDates, dateStr, instance) {
-      if (dateStr === '') return;
-      checkDate();
+      if (dateStr === '') return; // 날짜가 선택되지 않은 경우 처리 중단
+      checkDate(); // 날짜가 선택되면 checkDate() 함수 실행
     }
   });
 
   document.getElementById('theme-slots').addEventListener('click', event => {
     if (event.target.classList.contains('theme-slot')) {
+      // 모든 테마 슬롯에서 'active' 클래스 제거
       document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
+
+      // 클릭된 테마에 'active' 클래스 추가
       event.target.classList.add('active');
       checkDateAndTheme();
     }
@@ -33,16 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderTheme(themes) {
+  console.log(themes);
   const themeSlots = document.getElementById('theme-slots');
   themeSlots.innerHTML = '';
   themes.forEach(theme => {
-    /*
-    TODO: [1단계] 사용자 예약 - 테마 목록 조회 API 호출 후 렌더링
-          response 명세에 맞춰 createSlot 함수 호출 시 값 설정
-          createSlot('theme', theme name, theme id) 형태로 호출
-    */
-    const name = '';
-    const themeId = '';
+    const name = theme.name;
+    const themeId = theme.id;
+
     themeSlots.appendChild(createSlot('theme', name, themeId));
   });
 }
@@ -80,6 +81,7 @@ function checkDate() {
 function checkDateAndTheme() {
   const selectedDate = document.getElementById("datepicker").value;
   const selectedThemeElement = document.querySelector('.theme-slot.active');
+
   if (selectedDate && selectedThemeElement) {
     const selectedThemeId = selectedThemeElement.getAttribute('data-theme-id');
     fetchAvailableTimes(selectedDate, selectedThemeId);
@@ -87,20 +89,14 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-  /*
-  TODO: [1단계] 사용자 예약 - 예약 가능 시간 조회 API 호출
-        요청 포맷에 맞게 설정
-  */
-  fetch('/', { // 예약 가능 시간 조회 API endpoint
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => {
-    if (response.status === 200) return response.json();
-    throw new Error('Read failed');
-  }).then(renderAvailableTimes)
-  .catch(error => console.error("Error fetching available times:", error));
+  const queryString = new URLSearchParams({
+    date: date,
+    themeId: themeId
+  });
+
+  requestRead(`/api/times/available?${queryString}`)
+      .then(renderAvailableTimes)
+      .catch(error => console.error("Error fetching available times:", error));
 }
 
 function renderAvailableTimes(times) {
@@ -116,12 +112,8 @@ function renderAvailableTimes(times) {
     return;
   }
   times.forEach(time => {
-    /*
-    TODO: [1단계] 사용자 예약 - 예약 가능 시간 조회 API 호출 후 렌더링
-          response 명세에 맞춰 createSlot 함수 호출 시 값 설정
-    */
-    const startAt = '';
-    const timeId = '';
+    const startAt = time.startAt;
+    const timeId = time.timeId;
     const alreadyBooked = false;
 
     const div = createSlot('time', startAt, timeId, alreadyBooked); // createSlot('time', 시작 시간, time id, 예약 여부)
@@ -158,12 +150,12 @@ function onReservationButtonClick() {
   if (selectedDate && selectedThemeId && selectedTimeId) {
     const reservationData = {
       date: selectedDate,
-      themeId: selectedThemeId,
-      timeId: selectedTimeId,
+      themeId: Number(selectedThemeId),
+      timeId: Number(selectedTimeId),
       name: name
     };
 
-    fetch('/reservations', {
+    fetch('/api/reservations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -190,7 +182,16 @@ function onReservationButtonClick() {
 function requestRead(endpoint) {
   return fetch(endpoint)
       .then(response => {
-        if (response.status === 200) return response.json();
+        if (response.status === 200) {
+          return response.json();
+        }
+        if (response.status === 401) {
+          alert('Login First');
+          window.location.href = '/login';
+        }
         throw new Error('Read failed');
+      })
+      .then(responseBody => {
+        return responseBody.data;
       });
 }
