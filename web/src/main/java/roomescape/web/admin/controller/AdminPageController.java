@@ -8,12 +8,27 @@ public class AdminPageController {
 
     @GetMapping("/")
     public String home() {
-        return "admin/index";
+        return "login";
+    }
+
+    @GetMapping("/signup")
+    public String toSignUpPage() {
+        return "signup";
+    }
+
+    @GetMapping("/login")
+    public String toLoginPage() {
+        return "login";
+    }
+
+    @GetMapping("/customer/reservation")
+    public String customerReservation() {
+        return "customer/customer-reservation";
     }
 
     @GetMapping("/admin/reservation")
     public String reservation() {
-        return "admin/reservation-new";
+        return "admin/admin-reservation";
     }
 
     @GetMapping("/admin/time")
