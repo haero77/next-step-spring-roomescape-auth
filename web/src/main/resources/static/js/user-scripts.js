@@ -25,13 +25,26 @@ document.getElementById('logout-btn').addEventListener('click', function (event)
 /**
  * 회원가입 버튼 클릭
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('signup-form');
-  form.addEventListener('submit', function(event) {
+  form.addEventListener('submit', function (event) {
     signUp(event);
   });
 });
 
+/**
+ * 로그인 버튼 클릭
+ */
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('login-form');
+  form.addEventListener('submit', function (event) {
+    login(event);
+  });
+});
+
+/**
+ * 회원가입 API 호출
+ */
 function signUp(event) {
   event.preventDefault();
 
@@ -73,39 +86,12 @@ function signUp(event) {
       });
 }
 
+/**
+ * 로그인 API 호출
+ */
+function login(event) {
+  event.preventDefault(); // 로그인 실패 시 email, password 입력란을 비우지 않기 위해 기본 이벤트 방지.
 
-function updateUIBasedOnLogin() {
-  fetch('/login/check') // 로그인 상태 확인 API 호출
-      .then(response => {
-        if (!response.ok) { // 요청이 실패하거나 로그인 상태가 아닌 경우
-          throw new Error('Not logged in or other error');
-        }
-        return response.json(); // 응답 본문을 JSON으로 파싱
-      })
-      .then(data => {
-        // 응답에서 사용자 이름을 추출하여 UI 업데이트
-        document.getElementById('profile-name').textContent = data.name; // 프로필 이름 설정
-        document.querySelector('.nav-item.dropdown').style.display = 'block'; // 드롭다운 메뉴 표시
-        document.querySelector('.nav-item a[href="/login"]').parentElement.style.display = 'none'; // 로그인 버튼 숨김
-      })
-      .catch(error => {
-        // 에러 처리 또는 로그아웃 상태일 때 UI 업데이트
-        console.error('Error:', error);
-        document.getElementById('profile-name').textContent = 'Profile'; // 기본 텍스트로 재설정
-        document.querySelector('.nav-item.dropdown').style.display = 'none'; // 드롭다운 메뉴 숨김
-        document.querySelector('.nav-item a[href="/login"]').parentElement.style.display = 'block'; // 로그인 버튼 표시
-      });
-}
-
-// 드롭다운 메뉴 토글
-document.getElementById("navbarDropdown").addEventListener('click', function (e) {
-  e.preventDefault();
-  const dropdownMenu = e.target.closest('.nav-item.dropdown').querySelector('.dropdown-menu');
-  dropdownMenu.classList.toggle('show'); // Bootstrap 4에서는 data-toggle 사용, Bootstrap 5에서는 JS로 처리
-});
-
-
-function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
@@ -115,30 +101,75 @@ function login() {
     return; // 필수 입력 필드가 비어있으면 여기서 함수 실행을 중단
   }
 
-  fetch('/login', {
+  const loginRequestBody = {
+    email: email,
+    password: password
+  };
+
+  fetch('/api/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      email: email,
-      password: password
-    })
+    body: JSON.stringify(loginRequestBody)
   })
       .then(response => {
-        if (200 === !response.status) {
-          alert('Login failed'); // 로그인 실패 시 경고창 표시
-          throw new Error('Login failed');
-        }
+        return response.json().then(responseBody => {
+          if (!response.ok) {
+            alert('Login failed');
+            throw new Error('Login failed: ' + responseBody);
+          }
+        })
       })
-      .then(() => {
-        updateUIBasedOnLogin(); // UI 업데이트
+      .then(loginResponse => {
+        return callLoginCheckApi();
+      })
+      .then(loginCheckResponse => {
+        console.log('Login check response:', loginCheckResponse);
+        if (loginCheckResponse.data.userRole === 'ADMIN') {
+          window.location.href = '/admin/reservation';
+          return;
+        }
+        if (loginCheckResponse.data.userRole === 'CUSTOMER') {
+          window.location.href = '/customer/reservation';
+          return;
+        }
         window.location.href = '/';
       })
       .catch(error => {
-        console.error('Error during login:', error);
+        console.warn('Error during login:', error);
       });
 }
+
+function updateUIBasedOnLogin() {
+  // fetch('/login/check') // 로그인 상태 확인 API 호출
+  //     .then(response => {
+  //       if (!response.ok) { // 요청이 실패하거나 로그인 상태가 아닌 경우
+  //         throw new Error('Not logged in or other error');
+  //       }
+  //       return response.json(); // 응답 본문을 JSON으로 파싱
+  //     })
+  //     .then(data => {
+  //       // 응답에서 사용자 이름을 추출하여 UI 업데이트
+  //       document.getElementById('profile-name').textContent = data.name; // 프로필 이름 설정
+  //       document.querySelector('.nav-item.dropdown').style.display = 'block'; // 드롭다운 메뉴 표시
+  //       document.querySelector('.nav-item a[href="/login"]').parentElement.style.display = 'none'; // 로그인 버튼 숨김
+  //     })
+  //     .catch(error => {
+  //       // 에러 처리 또는 로그아웃 상태일 때 UI 업데이트
+  //       console.error('Error:', error);
+  //       document.getElementById('profile-name').textContent = 'Profile'; // 기본 텍스트로 재설정
+  //       document.querySelector('.nav-item.dropdown').style.display = 'none'; // 드롭다운 메뉴 숨김
+  //       document.querySelector('.nav-item a[href="/login"]').parentElement.style.display = 'block'; // 로그인 버튼 표시
+  //     });
+}
+
+// 드롭다운 메뉴 토글
+document.getElementById("navbarDropdown").addEventListener('click', function (e) {
+  e.preventDefault();
+  const dropdownMenu = e.target.closest('.nav-item.dropdown').querySelector('.dropdown-menu');
+  dropdownMenu.classList.toggle('show'); // Bootstrap 4에서는 data-toggle 사용, Bootstrap 5에서는 JS로 처리
+});
 
 function signup() {
   // Redirect to signup page
@@ -153,4 +184,16 @@ function base64DecodeUnicode(str) {
     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
   }).join('');
   return decodeURIComponent(encodedUriComponent);
+}
+
+function callLoginCheckApi() {
+  return fetch('/api/login/check')
+      .then(response => {
+        return response.json().then(data => {
+          if (!response.ok) {
+            throw new Error('Login check failed: ' + JSON.stringify(data));
+          }
+          return data;
+        });
+      });
 }
