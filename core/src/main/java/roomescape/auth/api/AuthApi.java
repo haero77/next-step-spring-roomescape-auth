@@ -61,7 +61,11 @@ public class AuthApi {
     @PostMapping("/api/logout")
     public ApiResponse<Void> logout(final HttpServletResponse servletResponse) {
         final HttpCookie cookie = ResponseCookie.from("accessToken", "")
-                .maxAge(0)
+                .path("/")           // login과 동일한 path 설정
+                .httpOnly(true)      // login과 동일한 httpOnly 설정
+                .secure(false)       // login과 동일한 secure 설정
+                .sameSite("Strict")  // login과 동일한 sameSite 설정
+                .maxAge(0)          // 쿠키 즉시 만료
                 .build();
         servletResponse.addHeader("Set-Cookie", cookie.toString());
 

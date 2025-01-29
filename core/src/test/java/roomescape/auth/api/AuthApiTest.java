@@ -124,7 +124,23 @@ class AuthApiTest extends RestAssuredTestSupport {
 
     // todo: 로그인 실패 시 401 반환하는 API 테스트 추가
 
-    // todo: logout API 테스트 추가
+    @DisplayName("로그아웃 시 accessToken 쿠키를 삭제한다")
+    @Test
+    void logout() {
+        // given
+        String accessToken = loginFixture.loginWithUserName("홍길동");
+
+        // when
+        final ValidatableResponse response = RestAssured
+                .given().log().all()
+                .cookie("accessToken", accessToken)
+                .when().post("/api/logout")
+                .then().log().all();
+
+        // then
+        String accessTokenCookie = response.extract().cookie("accessToken");
+        assertThat(accessTokenCookie).isEmpty();
+    }
 
     @DisplayName("로그인한 유저의 인증 정보 조회 시 유저 이름과 권한 반환")
     @Test
