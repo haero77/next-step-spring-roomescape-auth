@@ -13,20 +13,20 @@ document.getElementById('logout-btn').addEventListener('click', function (event)
  * 회원가입 버튼 클릭
  */
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('signup-form');
-  form.addEventListener('submit', function (event) {
-    signUp(event);
-  });
+  const signUpForm = document.getElementById('signup-form');
+  if (signUpForm) {
+    signUpForm.addEventListener('submit', signUp);
+  }
 });
 
 /**
  * 로그인 버튼 클릭
  */
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('login-form');
-  form.addEventListener('submit', function (event) {
-    login(event);
-  });
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', login);
+  }
 });
 
 /**
